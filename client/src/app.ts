@@ -1,5 +1,12 @@
 import {userAction , Role, referType} from "./models/model.js";
 
+let env: {API_URL:string};
+// fetching the env variables from the file
+( async function(){
+    let fetchData = await fetch('../env.json');
+    env = await fetchData.json();
+})();
+
 // this function is used as a decorator to format the dateTime for the created user
 function userCreatedDate(){
     return function(target: any,key:string,descriptor:PropertyDescriptor){
@@ -41,7 +48,7 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
             "address": arr[6],
             "createdDate": arr[7]
             }
-        fetch("http://localhost:9010/user/userCreate", {method: "POST",body:JSON.stringify(data),headers: {
+        fetch(env.API_URL, {method: "POST",body:JSON.stringify(data),headers: {
             "Content-type": "application/json; charset=UTF-8"
         }}).then(response => {
         return response.json()
@@ -71,15 +78,7 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
                 }
                 let cell = row.insertCell(-1)
                 let inputField = document.createElement('input') as HTMLInputElement;
-                if(j===5){
-                    inputField.type="number";
-                }
-                else if(j===4){
-                    inputField.type="email";
-                }
-                else{
-                    inputField.type = "text";
-                }
+                inputField.type = "text";
                 inputField.value =this.usersData[i][j]
                 inputField.disabled = true
                 cell.appendChild(inputField);
@@ -91,7 +90,7 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
     selectedRowEdit(refer:referType){
         let j : number = 0;
             for(j=0;j<refer.parentNode.parentNode.cells.length-1;j++){
-                if(j===7){
+                if(j===refer.parentNode.parentNode.cells.length-2){
                     continue;
                 }
                 refer.parentNode.parentNode.cells[j].childNodes[0].disabled = false
@@ -111,7 +110,6 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
                     
                 }
                 let data ={
-                    "userId":arrChanged[0],
                     "firstName": arrChanged[1],
                     "middleName": arrChanged[2],
                     "lastName": arrChanged[3],
@@ -121,7 +119,7 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
                     "address": arrChanged[7],
                     "createdDate": arrChanged[8]
                     }
-                fetch("http://localhost:9010/user/updateUser", {method: "PUT",body:JSON.stringify(data),headers: {
+                fetch(`${env.API_URL}/${arrChanged[0]}`, {method: "PUT",body:JSON.stringify(data),headers: {
                     "Content-type": "application/json; charset=UTF-8"
                 }}).then(()=>{
                     this.usersData[refer.parentNode.parentNode.rowIndex-1] = arrChanged;
@@ -152,7 +150,7 @@ export class User<T extends Array<object>,U extends Array<Array<string>>> implem
         let rIndex:number,table = document.getElementById("table_tag") as HTMLTableElement;
                 rIndex = i.parentNode.parentNode.rowIndex;
                 const deletedData = this.usersData.splice(rIndex-1,1);
-                fetch(`http://localhost:9010/user/userDelete?userid=${deletedData[0][0]}`,{method:'DELETE'}).then((response:any)=>{
+                fetch(`${env.API_URL}/${deletedData[0][0]}`,{method:'DELETE'}).then((response:any)=>{
                     table.deleteRow(rIndex)
                 })
 

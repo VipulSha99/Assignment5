@@ -4,8 +4,8 @@ import {getUserData,deleteUser, createUser,updateUser} from "../controller/user"
 const router = Router();
 
 router.get("/",getUserData);
-router.delete('/userDelete',deleteUser);
-router.post('/userCreate',createUser);
-router.put('/updateUser',updateUser)
+router.delete('/:id',deleteUser);
+router.post('/',createUser);
+router.put('/:id',updateUser)
 
 export default router;

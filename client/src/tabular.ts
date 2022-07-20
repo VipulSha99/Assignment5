@@ -5,6 +5,14 @@ let apiData: Array<object> = [];
 let usersData: Array<Array<string>> = [];
 let columnList: Array<string> = [];
 
+let env: {API_URL:string};
+// fetching the env variables from the file
+( async function(){
+    let fetchData = await fetch('../env.json');
+    env = await fetchData.json();
+})();
+
+
 // this api function is used to fetch the user data from the server
 function api<T>(url: string): Promise<T> {
     return fetch(url)
@@ -16,7 +24,7 @@ function api<T>(url: string): Promise<T> {
 
 // this load_button element execute function when click on load_button and fetch the data from server
 document.getElementById("load_button")?.addEventListener("click",async()=>{
-    let data: Array<object> = await api("http://localhost:9010/user");
+    let data: Array<object> = await api(env.API_URL);
     console.log(data)
     if(document.getElementById("load_button")!.innerText === "Refresh data"){
         let Table = document.getElementById("table_tag") as HTMLTableElement;
